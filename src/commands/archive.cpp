@@ -1,4 +1,5 @@
 #include "archive.hpp"
+#include "../http/http.hpp"
 
 #include <iostream>
 #include <string>
@@ -15,7 +16,8 @@ int archive_command(int argc, char **argv) {
   std::string subcommand = argv[0];
 
   if(subcommand == "update") {
-    std::cout << "Updating archive...\n";
+    std::string response = http_get("https://codeforces.com/api/contest.list");
+    std::cout << response.substr(0, 500) << '\n';
   } else if(subcommand == "list") {
     std::cout << "Listing archive...\n";
   } else if(subcommand == "install") {

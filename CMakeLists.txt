@@ -9,6 +9,11 @@ add_executable(lca
   src/main.cpp
   src/cli/cli.cpp
   src/commands/archive.cpp
+  src/http/http.cpp
 )
 
 target_include_directories(lca PRIVATE src)
+
+find_package(CURL REQUIRED)
+
+target_link_libraries(lca PRIVATE CURL::libcurl)
