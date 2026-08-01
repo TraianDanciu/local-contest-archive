@@ -11,6 +11,7 @@ add_executable(lca
   src/commands/archive.cpp
   src/http/http.cpp
   src/providers/codeforces.cpp
+  src/archive/archive.cpp
 )
 
 target_include_directories(lca PRIVATE src)
