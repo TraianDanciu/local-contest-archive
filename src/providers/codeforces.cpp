@@ -13,7 +13,6 @@ std::vector<Contest> codeforces_get_contests() {
     Contest contest;
     contest.id = contest_json["id"];
     contest.name = contest_json["name"];
-    contest.provider = "codeforces";
     contest.year = 0;
     contests.push_back(contest);
   }

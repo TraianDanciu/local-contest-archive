@@ -7,7 +7,5 @@
 struct Contest {
   int id;
   std::string name;
-  std::string provider;
   int year;
-  std::vector<Problem> problems;
 };
