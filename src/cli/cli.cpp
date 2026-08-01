@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <string>
-
 #include "commands/archive.hpp"
 
 int CLI::run(int argc, char **argv) {

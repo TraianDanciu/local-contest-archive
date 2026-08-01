@@ -1,5 +1,6 @@
 #include "archive.hpp"
 #include "../http/http.hpp"
+#include "../providers/codeforces.hpp"
 
 #include <iostream>
 #include <string>
@@ -16,8 +17,11 @@ int archive_command(int argc, char **argv) {
   std::string subcommand = argv[0];
 
   if(subcommand == "update") {
-    std::string response = http_get("https://codeforces.com/api/contest.list");
-    std::cout << response.substr(0, 500) << '\n';
+    std::vector<Contest> contests = codeforces_get_contests();
+    std::cout << "Found " << contests.size() << " contests\n\n";
+    for(int i = 0; i < 10 && i < (int)contests.size(); i++) {
+      std::cout << contests[i].id << " " << contests[i].name << "\n";
+    }
   } else if(subcommand == "list") {
     std::cout << "Listing archive...\n";
   } else if(subcommand == "install") {
