@@ -21,7 +21,19 @@ int archive_command(int argc, char **argv) {
     std::vector<Contest> contests = codeforces_get_contests();
     std::vector<Problem> problems = codeforces_get_problems();
     archive_save_codeforces(contests, problems);
-    std::cout << "Updated archive.\n";
+    
+    std::cout << "Downloading statements...\n";
+    int downloaded = 0;
+    for(const Problem &problem : problems) {
+      std::string html = codeforces_download_statement(problem);
+      archive_save_codeforces_statement(problem, html);
+      downloaded++;
+      std::cout << "\rDownloaded problem " << problem.id << " from contest " << problem.contest_id << std::flush;
+      if(downloaded == 5) {
+        break;
+      }
+    }
+    std::cout << "\nDone\n";
   } else if(subcommand == "list") {
     std::vector<Contest> contests = archive_load_codeforces();
     std::cout << "Found " << contests.size() << " contests\n";

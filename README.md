@@ -28,3 +28,32 @@ lca search centroid
 
 lca work CF_2000_A
 ```
+
+## Requirements
+
+- C++20
+- CMake
+- libcurl
+- Node.js
+- Playwright
+
+Install Playwright browsers with:
+
+```bash
+cd tools
+npm install
+npx playwright install chromium
+```
+
+## Notes
+
+Codeforces statements are downloaded using Playwright because direct HTTP requests are protected by Cloudflare.
+
+## Building
+
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```

@@ -85,3 +85,9 @@ std::vector<Contest> archive_load_codeforces() {
   });
   return contests;
 }
+
+void archive_save_codeforces_statement(const Problem &problem, const std::string &html) {
+  std::filesystem::path path = archive_path() / "codeforces" / std::to_string(problem.contest_id) / problem.id / "statement.html";
+  std::ofstream fout(path);
+  fout << html;
+}
