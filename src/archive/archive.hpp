@@ -6,6 +6,6 @@
 
 std::filesystem::path archive_path();
 
-void archive_save_codeforces(const std::vector<Contest> &contests);
+void archive_save_codeforces(const std::vector<Contest> &contests, const std::vector<Problem> &problems);
 
 std::vector<Contest> archive_load_codeforces();

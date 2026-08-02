@@ -19,7 +19,8 @@ int archive_command(int argc, char **argv) {
 
   if(subcommand == "update") {
     std::vector<Contest> contests = codeforces_get_contests();
-    archive_save_codeforces(contests);
+    std::vector<Problem> problems = codeforces_get_problems();
+    archive_save_codeforces(contests, problems);
     std::cout << "Updated archive.\n";
   } else if(subcommand == "list") {
     std::vector<Contest> contests = archive_load_codeforces();
