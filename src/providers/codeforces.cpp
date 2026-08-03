@@ -56,6 +56,6 @@ std::vector<Problem> codeforces_get_problems() {
 
 int codeforces_download_statements(const std::filesystem::path &job_file) {
   std::string script = std::string(LCA_TOOLS_DIR) + "/fetch_statement.js";
-  std::string command = "node \"" + script + "\" \"" + job_file.string() + "\"";
+  std::string command = "node --max-old-space-size=4096 \"" + script + "\" \"" + job_file.string() + "\"";
   return std::system(command.c_str());
 }

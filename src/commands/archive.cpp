@@ -36,8 +36,8 @@ int archive_command(int argc, char **argv) {
 }
 
 bool archive_statement_exists(const std::string &provider, const Problem &problem) {
-  std::filesystem::path path = archive_path() / provider / std::to_string(problem.contest_id) / problem.id / "statement.html";
-  return std::filesystem::exists(path);
+  std::filesystem::path problem_path = archive_path() / provider / std::to_string(problem.contest_id) / problem.id;
+  return std::filesystem::exists(problem_path / "statement.html") || std::filesystem::exists(problem_path / "statement.pdf");
 }
 
 void archive_update() {
@@ -47,13 +47,20 @@ void archive_update() {
 
   std::filesystem::path job_file = std::filesystem::temp_directory_path() / "lca_jobs.txt";
   std::ofstream fout(job_file);
+  int missing = 0;
   for(const Problem &problem : problems) {
+    if(archive_statement_exists("codeforces", problem)) {
+      continue;
+    }
+
     std::filesystem::path statement_path = archive_statement_path("codeforces", problem);
     std::filesystem::create_directories(statement_path.parent_path());
     fout << codeforces_problem_url(problem) << '\t' << statement_path.string() << '\n';
+    missing++;
   }
+  fout.close();
 
-  std::cout << "Downloading " << problems.size() << " statements...\n";
+  std::cout << "Downloading " << missing << " statements...\n";
   int result = codeforces_download_statements(job_file);
   std::filesystem::remove(job_file);
 
