@@ -40,7 +40,11 @@ std::vector<Problem> codeforces_get_problems() {
   return problems;
 }
 
-std::string codeforces_download_statement(const Problem &problem) {
+void codeforces_download_statement(const Problem &problem, const std::filesystem::path &output_path) {
   std::string url = "https://codeforces.com/contest/" + std::to_string(problem.contest_id) + "/problem/" + problem.id;
-  return http_get(url);
+  std::string command = "node tools/fetch_statement.js \"" + url + "\" \"" + output_path.string() + "\"";
+  int result = std::system(command.c_str());
+  if(result != 0) {
+    throw std::runtime_error("Failed to download Codeforces statement.");
+  }
 }

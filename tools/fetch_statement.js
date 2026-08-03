@@ -25,9 +25,15 @@ async function main() {
     timeout: 60000
   });
 
-  const statement = await page.locator(".problem-statement").evaluate(
-    node => node.outerHTML
-  );
+  const statement = await page.locator(".problem-statement").innerHTML().catch(() => null);
+  if(!statement || statement.includes("Just a moment")) {
+    console.error("Cloudflare challenge or empty statement for " + url);
+    process.exit(1);
+  }
+
+  fs.mkdirSync(require('path').dirname(output), {
+    recursive: true
+  });
 
   fs.writeFileSync(output, statement);
 

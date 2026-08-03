@@ -9,4 +9,4 @@ std::vector<Contest> codeforces_get_contests();
 
 std::vector<Problem> codeforces_get_problems();
 
-std::string codeforces_download_statement(const Problem &problem);
+void codeforces_download_statement(const Problem &problem, const std::filesystem::path &output_path);

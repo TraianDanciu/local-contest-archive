@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <algorithm>
 #include <unordered_map>
+#include <stdexcept>
 
 using json = nlohmann::json;
 
@@ -15,6 +16,18 @@ std::filesystem::path archive_path() {
   }
 
   return std::filesystem::path(home) / ".local" / "share" / "lca" / "archive";
+}
+
+std::filesystem::path archive_problem_path(const std::string &provider, const Problem &problem) {
+  if(provider == "codeforces") {
+    return archive_path() / "codeforces" / std::to_string(problem.contest_id) / problem.id;
+  }
+
+  throw std::runtime_error("Unknown provider.");
+}
+
+std::filesystem::path archive_statement_path(const std::string &provider, const Problem &problem) {
+  return archive_problem_path(provider, problem) / "statement.html";
 }
 
 void archive_save_codeforces(const std::vector<Contest> &contests, const std::vector<Problem> &problems) {
@@ -84,10 +97,4 @@ std::vector<Contest> archive_load_codeforces() {
     return a.id > b.id;
   });
   return contests;
-}
-
-void archive_save_codeforces_statement(const Problem &problem, const std::string &html) {
-  std::filesystem::path path = archive_path() / "codeforces" / std::to_string(problem.contest_id) / problem.id / "statement.html";
-  std::ofstream fout(path);
-  fout << html;
 }

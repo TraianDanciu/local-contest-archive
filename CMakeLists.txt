@@ -17,5 +17,6 @@ add_executable(lca
 target_include_directories(lca PRIVATE src)
 
 find_package(CURL REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
-target_link_libraries(lca PRIVATE CURL::libcurl)
+target_link_libraries(lca PRIVATE CURL::libcurl nlohmann_json::nlohmann_json)

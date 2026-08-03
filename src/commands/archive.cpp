@@ -18,22 +18,7 @@ int archive_command(int argc, char **argv) {
   std::string subcommand = argv[0];
 
   if(subcommand == "update") {
-    std::vector<Contest> contests = codeforces_get_contests();
-    std::vector<Problem> problems = codeforces_get_problems();
-    archive_save_codeforces(contests, problems);
-    
-    std::cout << "Downloading statements...\n";
-    int downloaded = 0;
-    for(const Problem &problem : problems) {
-      std::string html = codeforces_download_statement(problem);
-      archive_save_codeforces_statement(problem, html);
-      downloaded++;
-      std::cout << "\rDownloaded problem " << problem.id << " from contest " << problem.contest_id << std::flush;
-      if(downloaded == 5) {
-        break;
-      }
-    }
-    std::cout << "\nDone\n";
+    archive_update();
   } else if(subcommand == "list") {
     std::vector<Contest> contests = archive_load_codeforces();
     std::cout << "Found " << contests.size() << " contests\n";
@@ -47,4 +32,32 @@ int archive_command(int argc, char **argv) {
   }
 
   return 0;
+}
+
+bool archive_statement_exists(const std::string &provider, const Problem &problem) {
+  std::filesystem::path path = archive_path() / provider / std::to_string(problem.contest_id) / problem.id / "statement.html";
+  return std::filesystem::exists(path);
+}
+
+void archive_update() {
+  std::vector<Contest> contests = codeforces_get_contests();
+  std::vector<Problem> problems = codeforces_get_problems();
+  archive_save_codeforces(contests, problems);
+
+  std::cout << "Downloading statements\n";
+  int downloaded = 0;
+  for(const Problem &problem : problems) {
+    try {
+      std::filesystem::path statement_path = archive_statement_path("codeforces", problem);
+      std::filesystem::create_directories(statement_path.parent_path());
+      codeforces_download_statement(problem, statement_path);
+    } catch(const std::exception &e) {
+      std::cerr << "\nFailed to download " << problem.id << ": " << e.what() << '\n';
+    }
+
+    downloaded++;
+    std::cout << "\rDownloaded " << downloaded << "/" << problems.size() << " statements..." << std::flush;
+  }
+
+  std::cout << "\nDone\n";
 }
