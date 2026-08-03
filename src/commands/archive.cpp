@@ -2,9 +2,10 @@
 #include "../http/http.hpp"
 #include "../providers/codeforces.hpp"
 #include "../archive/archive.hpp"
-
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <stdexcept>
 
 int archive_command(int argc, char **argv) {
   if(argc == 0) {
@@ -44,20 +45,20 @@ void archive_update() {
   std::vector<Problem> problems = codeforces_get_problems();
   archive_save_codeforces(contests, problems);
 
-  std::cout << "Downloading statements\n";
-  int downloaded = 0;
+  std::filesystem::path job_file = std::filesystem::temp_directory_path() / "lca_jobs.txt";
+  std::ofstream fout(job_file);
   for(const Problem &problem : problems) {
-    try {
-      std::filesystem::path statement_path = archive_statement_path("codeforces", problem);
-      std::filesystem::create_directories(statement_path.parent_path());
-      codeforces_download_statement(problem, statement_path);
-    } catch(const std::exception &e) {
-      std::cerr << "\nFailed to download " << problem.id << ": " << e.what() << '\n';
-    }
-
-    downloaded++;
-    std::cout << "\rDownloaded " << downloaded << "/" << problems.size() << " statements..." << std::flush;
+    std::filesystem::path statement_path = archive_statement_path("codeforces", problem);
+    std::filesystem::create_directories(statement_path.parent_path());
+    fout << codeforces_problem_url(problem) << '\t' << statement_path.string() << '\n';
   }
 
-  std::cout << "\nDone\n";
+  std::cout << "Downloading " << problems.size() << " statements...\n";
+  int result = codeforces_download_statements(job_file);
+  std::filesystem::remove(job_file);
+
+  if(result != 0) {
+    throw std::runtime_error("Some statements failed to download.");
+  }
+  std::cout << "Done\n";
 }

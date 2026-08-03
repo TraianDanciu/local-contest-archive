@@ -22,12 +22,20 @@ std::string http_get(std::string url) {
   curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0");
   curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "");
   curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
+  curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 15L);
+  curl_easy_setopt(curl, CURLOPT_TIMEOUT, 60L);
 
   CURLcode res = curl_easy_perform(curl);
+
+  long http_code = 0;
+  curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
   curl_easy_cleanup(curl);
 
   if(res != CURLE_OK) {
     throw std::runtime_error(curl_easy_strerror(res));
+  }
+  if(http_code != 200) {
+    throw std::runtime_error("HTTP " + std::to_string(http_code) + " for " + url);
   }
 
   return response;

@@ -1,15 +1,26 @@
 #include "codeforces.hpp"
 #include "../http/http.hpp"
 #include <nlohmann/json.hpp>
+#include <stdexcept>
 
 using json = nlohmann::json;
+
+std::string codeforces_problem_url(const Problem &problem) {
+  return "https://codeforces.com/contest/" + std::to_string(problem.contest_id) + "/problem/" + problem.id;
+}
 
 std::vector<Contest> codeforces_get_contests() {
   std::string body = http_get("https://codeforces.com/api/contest.list");
   json j = json::parse(body);
+  if(j["status"] != "OK") {
+    throw std::runtime_error("Codeforces API Error: " + j.value("comment", "unknown"));
+  }
   
   std::vector<Contest> contests;
   for(auto &contest_json : j["result"]) {
+    if(contest_json["phase"] != "FINISHED") {
+      continue;
+    }
     Contest contest;
     contest.id = contest_json["id"];
     contest.name = contest_json["name"];
@@ -23,6 +34,9 @@ std::vector<Contest> codeforces_get_contests() {
 std::vector<Problem> codeforces_get_problems() {
   std::string body = http_get("https://codeforces.com/api/problemset.problems");
   json j = json::parse(body);
+  if(j["status"] != "OK") {
+    throw std::runtime_error("Codeforces API Error: " + j.value("comment", "unknown"));
+  }
 
   std::vector<Problem> problems;
   for(auto &problem_json : j["result"]["problems"]) {
@@ -40,11 +54,8 @@ std::vector<Problem> codeforces_get_problems() {
   return problems;
 }
 
-void codeforces_download_statement(const Problem &problem, const std::filesystem::path &output_path) {
-  std::string url = "https://codeforces.com/contest/" + std::to_string(problem.contest_id) + "/problem/" + problem.id;
-  std::string command = "node tools/fetch_statement.js \"" + url + "\" \"" + output_path.string() + "\"";
-  int result = std::system(command.c_str());
-  if(result != 0) {
-    throw std::runtime_error("Failed to download Codeforces statement.");
-  }
+int codeforces_download_statements(const std::filesystem::path &job_file) {
+  std::string script = std::string(LCA_TOOLS_DIR) + "/fetch_statement.js";
+  std::string command = "node \"" + script + "\" \"" + job_file.string() + "\"";
+  return std::system(command.c_str());
 }

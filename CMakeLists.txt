@@ -20,3 +20,5 @@ find_package(CURL REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 target_link_libraries(lca PRIVATE CURL::libcurl nlohmann_json::nlohmann_json)
+
+target_compile_definitions(lca PRIVATE "LCA_TOOLS_DIR=\"${CMAKE_SOURCE_DIR}/tools\"")
