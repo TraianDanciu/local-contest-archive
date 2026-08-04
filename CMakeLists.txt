@@ -9,9 +9,11 @@ add_executable(lca
   src/main.cpp
   src/cli/cli.cpp
   src/commands/archive.cpp
+  src/commands/convert.cpp
   src/http/http.cpp
   src/providers/codeforces.cpp
   src/archive/archive.cpp
+  src/convert/convert.cpp
 )
 
 target_include_directories(lca PRIVATE src)

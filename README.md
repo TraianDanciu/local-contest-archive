@@ -31,7 +31,7 @@ lca work CF_2000_A
 
 ## Requirements
 
-- C++20
+- C++23
 - CMake
 - libcurl
 - Node.js
@@ -44,6 +44,19 @@ cd tools
 npm install
 npx playwright install chromium
 ```
+
+## Converting statements
+
+Statements are stored as raw HTML (or PDF for some problems) after download.
+
+Convert them to Markdown with:
+
+```bash
+lca convert          # all contests
+lca convert 1791     # one contest
+```
+
+Each statement.html creates a statement.md beside it, with math kept as readable text and images downloaded into a local statement_files/ directory. Problems whose statement is PDF-only are skipped and reported.
 
 ## Notes
 
