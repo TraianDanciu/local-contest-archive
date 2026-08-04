@@ -69,15 +69,15 @@ namespace {
     fout << j.dump(4);
   }
 
-  void atcoder_update(const std::string &only_contest) {
+  void atcoder_update(const std::vector<std::string> &only_contests) {
     std::filesystem::path provider_path = archive_path() / "atcoder";
     std::filesystem::create_directories(provider_path);
 
     std::unordered_set<std::string> seen = load_seen_tasks(provider_path);
 
     std::vector<std::string> ids;
-    if(!only_contest.empty()) {
-      ids.push_back(only_contest);
+    if(!only_contests.empty()) {
+      ids = only_contests;
     } else {
       std::cout << "Listing contests...\n";
       ids = atcoder_list_contests();
@@ -183,28 +183,22 @@ namespace {
 int atcoder_command(int argc, char **argv) {
   if(argc == 0) {
     std::cout << "AtCoder commands\n";
-    std::cout << "    update [contest_id]\n";
-    std::cout << "    list\n";
-    std::cout << "    convert [contest_id]\n";
+    std::cout << "    update [contest_ids]    download and extract contests (all if none given)\n";
+    std::cout << "    list                    list available contests\n";
+    std::cout << "    convert [contest_ids]   convert HTML statements to markdown from contests (all if none given)\n";
     return 0;
   }
 
   std::string subcommand = argv[0];
 
   if(subcommand == "update") {
-    std::string only_contest;
-    if(argc >= 2) {
-      only_contest = argv[1];
-    }
-    atcoder_update(only_contest);
+    std::vector<std::string> ids(argv + 1, argv + argc);
+    atcoder_update(ids);
   } else if(subcommand == "list") {
     atcoder_list();
   } else if(subcommand == "convert") {
-    std::string only_contest;
-    if(argc >= 2) {
-      only_contest = argv[1];
-    }
-    return convert_provider(archive_path() / "atcoder", only_contest);
+    std::vector<std::string> ids(argv + 1, argv + argc);
+    return convert_provider(archive_path() / "atcoder", ids);
   } else {
     std::cout << "Unknown atcoder command\n";
     return 1;
