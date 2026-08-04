@@ -8,20 +8,9 @@
 #include <sstream>
 #include <string>
 
-int convert_command(int argc, char **argv) {
-  int only_contest = -1;
-  if(argc >= 1) {
-    try {
-      only_contest = std::stoi(argv[0]);
-    } catch(...) {
-      std::cout << "Usage: lca convert [contest_id]\n";
-      return 1;
-    }
-  }
-
-  std::filesystem::path provider_path = archive_path() / "codeforces";
+int convert_provider(const std::filesystem::path &provider_path, const std::string &only_contest) {
   if(!std::filesystem::exists(provider_path)) {
-    std::cout << "No codeforces archive found.\n";
+    std::cout << "No " << provider_path.filename().string() << " archive found.\n";
     return 0;
   }
 
@@ -31,13 +20,8 @@ int convert_command(int argc, char **argv) {
       continue;
     }
 
-    int contest_id = -1;
-    try {
-      contest_id = std::stoi(contest_entry.path().filename().string());
-    } catch(...) {
-      continue;
-    }
-    if(only_contest != -1 && contest_id != only_contest) {
+    std::string contest_id = contest_entry.path().filename().string();
+    if(!only_contest.empty() && contest_id != only_contest) {
       continue;
     }
 
@@ -86,4 +70,22 @@ int convert_command(int argc, char **argv) {
   std::cout << "Done: " << converted << " converted, " << skipped << " already converted, "
             << failed << " failed, " << pdfs << " PDF-only, " << missing << " no statement.\n";
   return failed == 0 ? 0 : 1;
+}
+
+int convert_command() {
+  std::filesystem::path root = archive_path();
+  if(!std::filesystem::exists(root)) {
+    std::cout << "No archive found\n";
+    return 0;
+  }
+
+  int status = 0;
+  for(const auto &provider_entry : std::filesystem::directory_iterator(root)) {
+    if(!provider_entry.is_directory()) {
+      continue;
+    }
+    std::cout << "== " << provider_entry.path().filename().string() << "\n";
+    status |= convert_provider(provider_entry.path(), "");
+  }
+  return status;
 }

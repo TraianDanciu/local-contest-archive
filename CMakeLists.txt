@@ -8,10 +8,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(lca
   src/main.cpp
   src/cli/cli.cpp
-  src/commands/archive.cpp
+  src/commands/codeforces.cpp
+  src/commands/atcoder.cpp
   src/commands/convert.cpp
   src/http/http.cpp
   src/providers/codeforces.cpp
+  src/providers/atcoder.cpp
   src/archive/archive.cpp
   src/convert/convert.cpp
 )
