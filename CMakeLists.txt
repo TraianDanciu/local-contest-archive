@@ -11,9 +11,11 @@ add_executable(lca
   src/commands/codeforces.cpp
   src/commands/atcoder.cpp
   src/commands/convert.cpp
+  src/commands/oi.cpp
   src/http/http.cpp
   src/providers/codeforces.cpp
   src/providers/atcoder.cpp
+  src/providers/oi.cpp
   src/archive/archive.cpp
   src/convert/convert.cpp
 )
