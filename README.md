@@ -7,7 +7,7 @@ Local Contest Archive (LCA) is a command-line tool for downloading, organizing a
 - Download contests from multiple providers
   - Codeforces
   - AtCoder
-  - QOJ
+  - Online OI database
 - Local archive
 - Search by contest, problem and topic
 - Bookmarks

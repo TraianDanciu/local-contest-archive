@@ -100,6 +100,20 @@ def put_index(repo, index):
         "-f", "content=" + body["content"]] + (["-f", "sha=" + body["sha"]] if "sha" in body else []))
 
 
+def ensure_repo_initialized(repo):
+    """GitHub releases in empty repos; create an initial README first."""
+    info = json.loads(gh(["api", "repos/{}".format(repo)]).stdout)
+    if info.get("isEmpty", False):
+        content = base64.b64encode(
+            b"# LCA online database\n\n"
+            b"OI archives downloaded by `lca oi update`. One release per "
+            b"olympiad, one asset (year tarball) per contest year. The list of "
+            b"assets and sizes lives in index.json in the repo root.\n").decode()
+        gh(["api", "-X", "PUT", "-H", "Accept: application/vnd.github+json",
+            "repos/{}/contents/README.md".format(repo),
+            "-f", "message=Initial commit", "-f", "content=" + content])
+        print("[init] created initial README in " + repo)
+
 def ensure_release(repo, tag):
     result = gh(["release", "view", tag, "--repo", repo], check=False)
     if result.returncode != 0:
@@ -120,6 +134,7 @@ def main():
 
     if not args.dry_run:
         gh(["auth", "status"])
+    ensure_repo_initialized(repo)
 
     olympiad_ids = [name for name, _ in OLYMPIADS]
 
