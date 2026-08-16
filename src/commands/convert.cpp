@@ -7,16 +7,12 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <unordered_set>
-#include <vector>
 
-int convert_provider(const std::filesystem::path &provider_path, const std::vector<std::string> &only_contests) {
+int convert_provider(const std::filesystem::path &provider_path, const std::string &only_contest) {
   if(!std::filesystem::exists(provider_path)) {
     std::cout << "No " << provider_path.filename().string() << " archive found.\n";
     return 0;
   }
-
-  std::unordered_set<std::string> wanted(only_contests.begin(), only_contests.end());
 
   int converted = 0, skipped = 0, pdfs = 0, missing = 0, failed = 0;
   for(const auto &contest_entry : std::filesystem::directory_iterator(provider_path)) {
@@ -25,7 +21,7 @@ int convert_provider(const std::filesystem::path &provider_path, const std::vect
     }
 
     std::string contest_id = contest_entry.path().filename().string();
-    if(!wanted.empty() && !wanted.count(contest_id)) {
+    if(!only_contest.empty() && contest_id != only_contest) {
       continue;
     }
 
@@ -89,7 +85,7 @@ int convert_command() {
       continue;
     }
     std::cout << "== " << provider_entry.path().filename().string() << "\n";
-    status |= convert_provider(provider_entry.path(), {});
+    status |= convert_provider(provider_entry.path(), "");
   }
   return status;
 }

@@ -2,7 +2,6 @@
 #include "commands/codeforces.hpp"
 #include "commands/atcoder.hpp"
 #include "commands/convert.hpp"
-#include "commands/oi.hpp"
 #include <iostream>
 #include <string>
 
@@ -12,7 +11,6 @@ int CLI::run(int argc, char **argv) {
     std::cout << "Usage:\n";
     std::cout << "    lca codeforces\n";
     std::cout << "    lca atcoder\n";
-    std::cout << "    lca oi\n";
     std::cout << "    lca convert\n";
     return 0;
   }
@@ -24,9 +22,6 @@ int CLI::run(int argc, char **argv) {
   }
   if(command == "atcoder") {
     return atcoder_command(argc - 2, argv + 2);
-  }
-  if(command == "oi") {
-    return oi_command(argc - 2, argv + 2);
   }
   if(command == "convert") {
     return convert_command();
