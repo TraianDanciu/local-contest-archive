@@ -13,24 +13,20 @@ Local Contest Archive (LCA) is a command-line tool for downloading, organizing a
 - Bookmarks
 - Notes
 - Workspace
-- Continue unfinished problems
 
 ## Example
 
 ```bash
-lca oi list ioi        # years available in the online database
-
-lca oi update ioi      # download all IOI years
-
-lca oi update ejoi 2020 2021   # only those years
-
+lca oi list ioi                   # years available in the online database
+lca oi update ioi                 # download all IOI years
+lca oi update ejoi 2020 2021      # only those years
 lca atcoder update abc001 abc002  # several contests at once
-
 lca codeforces convert 1791 2000  # convert several contests at once
-
+lca work ioi/2016/F               # start working on a problem
+lca continue                      # problems in progress
+lca solved ioi/2016/F             # mark it as solved
+lca solved                        # solved problems, grouped by olympiad and year
 lca search centroid
-
-lca work CF_2000_A
 ```
 
 ## Requirements
@@ -105,4 +101,10 @@ mkdir build
 cd build
 cmake ..
 make
+```
+
+To run `lca` from any directory, symlink the binary into your PATH:
+
+```bash
+ln -sf "$PWD/build/lca" ~/.local/bin/lca
 ```

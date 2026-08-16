@@ -3,6 +3,7 @@
 #include "commands/atcoder.hpp"
 #include "commands/convert.hpp"
 #include "commands/oi.hpp"
+#include "commands/work.hpp"
 #include <iostream>
 #include <string>
 
@@ -13,6 +14,11 @@ int CLI::run(int argc, char **argv) {
     std::cout << "    lca codeforces\n";
     std::cout << "    lca atcoder\n";
     std::cout << "    lca oi\n";
+    std::cout << "    lca work\n";
+    std::cout << "    lca continue\n";
+    std::cout << "    lca solved\n";
+    std::cout << "    lca unsolved\n";
+    std::cout << "    lca unwork\n";
     std::cout << "    lca convert\n";
     return 0;
   }
@@ -27,6 +33,21 @@ int CLI::run(int argc, char **argv) {
   }
   if(command == "oi") {
     return oi_command(argc - 2, argv + 2);
+  }
+  if(command == "work") {
+    return work_command(argc - 2, argv + 2);
+  }
+  if(command == "continue") {
+    return work_continue_command(argc - 2, argv + 2);
+  }
+  if(command == "solved") {
+    return work_solved_command(argc - 2, argv + 2);
+  }
+  if(command == "unsolved") {
+    return work_unsolved_command(argc - 2, argv + 2);
+  }
+  if(command == "unwork") {
+    return work_unwork_command(argc - 2, argv + 2);
   }
   if(command == "convert") {
     return convert_command();
