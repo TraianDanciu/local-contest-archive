@@ -19,6 +19,8 @@ int CLI::run(int argc, char **argv) {
     std::cout << "    lca solved\n";
     std::cout << "    lca unsolved\n";
     std::cout << "    lca unwork\n";
+    std::cout << "    lca bookmark\n";
+    std::cout << "    lca unbookmark\n";
     std::cout << "    lca convert\n";
     return 0;
   }
@@ -48,6 +50,12 @@ int CLI::run(int argc, char **argv) {
   }
   if(command == "unwork") {
     return work_unwork_command(argc - 2, argv + 2);
+  }
+  if(command == "bookmark") {
+    return work_bookmark_command(argc - 2, argv + 2);
+  }
+  if(command == "unbookmark") {
+    return work_unbookmark_command(argc - 2, argv + 2);
   }
   if(command == "convert") {
     return convert_command();

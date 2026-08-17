@@ -125,11 +125,15 @@ namespace {
       json j;
       j["started"] = json::array();
       j["solved"] = json::array();
+      j["bookmarks"] = json::array();
       return j;
     }
     std::ifstream fin(path);
     json j;
     fin >> j;
+    if(!j.contains("bookmarks")) {
+      j["bookmarks"] = json::array();
+    }
     return j;
   }
 
@@ -240,8 +244,16 @@ namespace {
     auto &started = progress["started"];
     started.erase(std::remove(started.begin(), started.end(), id.path_str), started.end());
     progress["solved"].push_back(id.path_str);
-    save_progress(progress);
-    std::cout << "Solved: " << id.path_str << "\n";
+    auto &bookmarks = progress["bookmarks"];
+    auto bm_it = std::find(bookmarks.begin(), bookmarks.end(), id.path_str);
+    if(bm_it != bookmarks.end()) {
+      bookmarks.erase(bm_it);
+      save_progress(progress);
+      std::cout << "Solved: " << id.path_str << " (bookmark removed)\n";
+    } else {
+      save_progress(progress);
+      std::cout << "Solved: " << id.path_str << "\n";
+    }
     return 0;
   }
 
@@ -285,6 +297,10 @@ namespace {
     auto old_solved_size = solved.size();
     solved.erase(std::remove(solved.begin(), solved.end(), id.path_str), solved.end());
     removed = (removed || solved.size() != old_solved_size);
+    auto &bookmarks = progress["bookmarks"];
+    auto old_bm_size = bookmarks.size();
+    bookmarks.erase(std::remove(bookmarks.begin(), bookmarks.end(), id.path_str), bookmarks.end());
+    removed = (removed || bookmarks.size() != old_bm_size);
 
     if(!removed) {
       std::cout << id.path_str << " is not in any list\n";
@@ -295,17 +311,68 @@ namespace {
     std::cout << "Removed: " << id.path_str << "\n";
     return 0;
   }
+
+  int work_bookmark(const std::string &input) {
+    ProblemId id;
+    std::string error;
+    if(!parse_problem_id(input, id, error)) {
+      std::cout << error << "\n";
+      return 1;
+    }
+
+    json progress = load_progress();
+    if(in_list(progress["bookmarks"], id.path_str)) {
+      std::cout << "Already bookmarked: " << id.path_str << "\n";
+      return 0;
+    }
+
+    progress["bookmarks"].push_back(id.path_str);
+    save_progress(progress);
+    std::cout << "Bookmarked: " << id.path_str << "\n";
+    return 0;
+  }
+
+  int work_unbookmark(const std::string &input) {
+    ProblemId id;
+    std::string error;
+    if(!parse_problem_id(input, id, error)) {
+      std::cout << error << "\n";
+      return 1;
+    }
+
+    json progress = load_progress();
+    auto &bookmarks = progress["bookmarks"];
+    auto it = std::find(bookmarks.begin(), bookmarks.end(), id.path_str);
+    if(it == bookmarks.end()) {
+      std::cout << id.path_str << " is not bookmarked\n";
+      return 1;
+    }
+
+    bookmarks.erase(it);
+    save_progress(progress);
+    std::cout << "Bookmark removed: " << id.path_str << "\n";
+    return 0;
+  }
+
+  int work_bookmark_list(const std::string &filter) {
+    json progress = load_progress();
+    std::cout << "Bookmarks:\n";
+    print_grouped(progress["bookmarks"], filter);
+    return 0;
+  }
 }
 
 int work_command(int argc, char **argv) {
   if(argc == 0) {
     std::cout << "Work commands\n";
-    std::cout << "    lca work <provider>/<contest>/<letter>       start working on a problem\n";
-    std::cout << "    lca continue [provider]                      list problems in progress\n";
-    std::cout << "    lca solved [provider]                        list solved problems\n";
-    std::cout << "    lca solved <provider>/<contest>/<letter>     mark a problem as solved\n";
-    std::cout << "    lca unsolved <provider>/<contest>/<letter>   move a solved problem back to in progress\n";
-    std::cout << "    lca unwork <provider>/<contest>/<letter>     remove a problem from both lists\n";
+    std::cout << "    lca work <provider>/<contest>/<letter>         start working on a problem\n";
+    std::cout << "    lca continue [provider]                        list problems in progress\n";
+    std::cout << "    lca solved [provider]                          list solved problems\n";
+    std::cout << "    lca solved <provider>/<contest>/<letter>       mark a problem as solved\n";
+    std::cout << "    lca unsolved <provider>/<contest>/<letter>     move a solved problem back to in progress\n";
+    std::cout << "    lca unwork <provider>/<contest>/<letter>       remove a problem from both lists\n";
+    std::cout << "    lca bookmark <provider>/<contest>/<letter>     bookmark a problem\n";
+    std::cout << "    lca unbookmark <provider>/<contest>/<letter>   remove a bookmark\n";
     return 0;
   }
 
@@ -348,4 +415,22 @@ int work_unwork_command(int argc, char **argv) {
     return 1;
   }
   return work_unwork(argv[0]);
+}
+
+int work_bookmark_command(int argc, char **argv) {
+  if(argc < 1) {
+    return work_bookmark_list("");
+  }
+  if(std::string(argv[0]).find('/') != std::string::npos) {
+    return work_bookmark(argv[0]);
+  }
+  return work_bookmark_list(to_lower(argv[0]));
+}
+
+int work_unbookmark_command(int argc, char **argv) {
+  if(argc < 1) {
+    std::cout << "Usage: lca unbookmark <provider>/<contest>/<letter>\n";
+    return 1;
+  }
+  return work_unbookmark(argv[0]);
 }
